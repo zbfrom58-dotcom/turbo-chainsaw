@@ -1,0 +1,16 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Боец — осмотр модели</title><style>body{margin:0;background:#14242b;color:#edf2e8;font:15px Arial}canvas{display:block}aside{position:fixed;left:30px;top:25px;max-width:300px}h1{font-size:30px}p{line-height:1.7;color:#b9c8c1}a{color:#d3fa67}button{background:#d3fa67;border:0;padding:12px 20px;cursor:pointer}#status{font:12px monospace}footer{position:fixed;bottom:20px;left:30px;right:30px;font-size:11px;color:#b9c8c1}</style></head><body><aside><a href="/">← Вернуться к игре</a><h1>Боец</h1><p>В игре используется ваша модель Soldier Full Tactical Gear со скелетом и анимацией ожидания.</p><button id="rotate">Остановить вращение</button><p id="status">Загрузка модели…</p></aside><footer>Soldier Full Tactical Gear — DanlyVostok · CC BY 4.0. Текстуры уменьшены до 1024 px. Карта — vrchris · CC BY 4.0.</footer><script type="module">
+import * as T from './vendor/three.module.js';
+import {loadWorld} from './world.js';
+const scene=new T.Scene();scene.background=new T.Color(0x14242b);
+const camera=new T.PerspectiveCamera(40,innerWidth/innerHeight,.05,100);camera.position.set(2.5,1.5,4);camera.lookAt(0,1,0);
+const renderer=new T.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));document.body.appendChild(renderer.domElement);
+scene.add(new T.HemisphereLight(0xe1efff,0x877a65,2.5));const light=new T.DirectionalLight(0xffedda,3);light.position.set(3,5,4);scene.add(light);
+const platform=new T.Mesh(new T.CylinderGeometry(.8,.9,.07,64),new T.MeshStandardMaterial({color:0x304047}));platform.position.y=-.035;scene.add(platform);
+let soldier,rotate=true;
+if(new URLSearchParams(location.search).has("lobby")){document.querySelector("aside").style.display="none";document.querySelector("footer").style.display="none";}
+let dragging=false,lastX=0;renderer.domElement.style.touchAction="none";renderer.domElement.onpointerdown=e=>{dragging=true;lastX=e.clientX;rotate=false;renderer.domElement.setPointerCapture(e.pointerId);};renderer.domElement.onpointermove=e=>{if(dragging&&soldier){soldier.root.rotation.y+=(e.clientX-lastX)*.012;lastX=e.clientX;}};renderer.domElement.onpointerup=renderer.domElement.onpointercancel=()=>dragging=false;const clock=new T.Clock();document.getElementById('rotate').onclick=()=>{rotate=!rotate;document.getElementById('rotate').textContent=rotate?'Остановить вращение':'Вращать модель';};
+loadWorld(new T.Scene(),text=>document.getElementById('status').textContent=text).then(world=>{soldier=world.makeSoldier();scene.add(soldier.root);soldier.marker.visible=false;document.getElementById('status').textContent=`Рост: 1,82 м · ${world.modelInfo.animation} · масштаб ${world.modelInfo.soldierScale.toFixed(4)}`;}).catch(e=>document.getElementById('status').textContent=e.message);
+function tick(){requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.05);if(soldier){soldier.mixer.update(dt);soldier.pose();if(rotate)soldier.root.rotation.y+=dt*.35;}renderer.render(scene,camera);}tick();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script></body></html>
+

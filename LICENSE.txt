@@ -1,0 +1,7 @@
+Low Poly Weapon Pack — byzmod3d
+Source: https://opengameart.org/content/ak-47-low-poly-weapon-pack-wip
+License: CC0 1.0 / public domain (as stated by the author on the source page).
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+Files used: ak47.obj, m16.obj, pistol.obj, 12_gauge.obj, sniper.obj.
+Changes in this game: scale normalization, new Three.js materials, first-person placement.
+MP5 and M249 representations are procedural game meshes, not external scans.
